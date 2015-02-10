@@ -1,0 +1,4 @@
+flask >=0.10.1, <0.10.99
+
+gevent >=1.0.1, <1.0.99 #adding async support to gunicorn
+gunicorn >=19.2.1, <19.2.99

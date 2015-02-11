@@ -7,4 +7,5 @@ web:
   ports:
     - 80:80
   environment:
+    - PYTHONUNBUFFERED=True #disable print buffering in gunicorn
     - MODE=dev

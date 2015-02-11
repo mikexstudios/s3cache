@@ -1,9 +1,11 @@
 from flask import Flask, request
 
-import urllib
+import os, urllib
 
 app = Flask(__name__)
-app.debug = True
+
+if os.environ.get('MODE') == 'dev':
+    app.debug = True
 
 @app.route('/')
 def home():

@@ -1,0 +1,10 @@
+# This file is used to specify command line arguments to the docker run command
+# rather than for replacing the Dockerfile.
+web:
+  build: .
+  volumes:
+    - .:/usr/src/app/:ro
+  ports:
+    - 80:8000
+  environment:
+    - MODE=dev

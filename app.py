@@ -1,13 +1,14 @@
-from flask import Flask, request
+from flask import Flask, request, redirect, abort
 import boto
 
 import os, urllib
 import hmac, hashlib #for creating S3 signature
 
 app = Flask(__name__)
-
 if os.environ.get('MODE') == 'dev':
     app.debug = True
+
+BASE_S3_URL = 'http://s3.amazonaws.com/%s' % os.environ['S3_BUCKET']
 
 @app.route('/')
 def home():
@@ -17,11 +18,20 @@ def home():
 def cache(key):
     # reconstruct original S3 path:
     full_path = '%s?%s' % (urllib.quote(key), request.query_string)
-    generated_signature = get_s3_signature(key, request.args.get('Expires'))
-    request_signature = urllib.quote_plus(request.args.get('Signature'))
-    assert generated_signature == request_signature
 
-    return '%s\n%s' % (full_path, generated_signature)
+    # verify signature
+    # NOTE: at the moment, we assume that all requests come with Signature and
+    # Expires fields.
+    try:
+        request_signature = urllib.quote_plus(request.args.get('Signature'))
+        generated_signature = get_s3_signature(key, request.args.get('Expires'))
+    except TypeError:
+        abort(401)
+    if generated_signature != request_signature:
+        abort(401)
+
+    return redirect('%s/%s' % (BASE_S3_URL, full_path))
+    #return '%s\n%s' % (full_path, generated_signature)
 
 
 # Adapted from https://github.com/nzoschke/s3/blob/master/s3.py

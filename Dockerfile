@@ -24,5 +24,6 @@ COPY nginx/sites-enabled/default /etc/nginx/sites-enabled/default
 RUN apt-get install -y vim
 
 EXPOSE 8000 
-VOLUME ["/usr/src/app", ] #for webapp
+RUN mkdir /tmp/s3cache
+VOLUME ["/usr/src/app", "/tmp/s3cache"] #for webapp
 CMD nginx && gunicorn --config gunicorn.py.ini app:app

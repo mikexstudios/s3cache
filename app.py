@@ -4,7 +4,7 @@ import os, urllib
 from urlparse import urlparse
 import hmac, hashlib #for creating S3 signature
 import time
-import multiprocessing
+import multiprocessing, fcntl
 
 app = Flask(__name__)
 if os.environ.get('MODE') == 'dev':
@@ -92,14 +92,35 @@ def key_to_filename(key):
 def save_file(url):
     key = urlparse(url).path.lstrip('/')
     key = key_to_filename(key)
+    target = os.path.join(CACHE_ROOT, key)
+    # NOTE: To get a lock we need to open the file, but before saving
+    # the URL retrieved file, we need to unlock.
+    f = open(target, 'w') 
+
+    # Lock file to prevent multiple downloads of same file. If lock exists,
+    # skip getting file.
     try:
-        urllib.urlretrieve(url, os.path.join(CACHE_ROOT, key))
+        fcntl.flock(f, fcntl.LOCK_EX | fcntl.LOCK_NB)
+    except IOError:
+        return #lock exists
+
+    try:
+        temp = urllib.urlretrieve(url)[0]
     except urllib.ContentTooShortError:
-        pass
+        return #failed to get URL
+    finally:
+        # unlock file
+        fcntl.lockf(f, fcntl.LOCK_UN)
+        f.close()
+    os.rename(temp, target)
 
 def is_url_cached(url):
     key = urlparse(url).path.lstrip('/')
     key = key_to_filename(key)
-    if os.path.exists(os.path.join(CACHE_ROOT, key)):
-        return True
+    try:
+        # also checks if file exists
+        if os.path.getsize(os.path.join(CACHE_ROOT, key)) > 0:
+            return True
+    except OSError:
+        pass #file does not exist
     return False

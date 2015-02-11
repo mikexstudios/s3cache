@@ -2,6 +2,7 @@ from flask import Flask, request, redirect, abort, make_response
 
 import os, urllib
 import hmac, hashlib #for creating S3 signature
+import time
 from urlparse import urlparse
 
 app = Flask(__name__)
@@ -25,12 +26,18 @@ def cache(key):
     full_path = '%s?%s' % (key, request.query_string)
     full_url = '%s/%s' % (BASE_S3_URL, full_path)
 
+    # verify expires
+    expires = int(request.args.get('Expires'))
+    now = int(time.time())
+    if expires <= now:
+        abort(401)
+
     # verify signature
     # NOTE: at the moment, we assume that all requests come with Signature and
     # Expires fields.
     try:
         request_signature = urllib.quote_plus(request.args.get('Signature'))
-        generated_signature = get_s3_signature(key, request.args.get('Expires'))
+        generated_signature = get_s3_signature(key, expires)
     except TypeError:
         abort(401)
     if generated_signature != request_signature:
@@ -59,6 +66,7 @@ def cache(key):
 # NOTE: key must be urllib.quote
 def get_s3_signature(key, expires):
     http_verb = 'GET'
+    expires = str(expires)
     bucket = os.environ['S3_BUCKET']
     canonical_string = '/%s/%s' % (bucket, key)
     canonical_string = canonical_string.rstrip('/') #when key = ''

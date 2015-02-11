@@ -11,4 +11,5 @@ web:
     - MODE=dev
     - S3_BUCKET #define on command line
     - S3_ACCESS_KEY_ID #define on command line
-    - S3_SECRET_ACCESS_KEY
+    - S3_SECRET_ACCESS_KEY #define on command line
+

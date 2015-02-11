@@ -1,9 +1,10 @@
 from flask import Flask, request, redirect, abort, make_response
 
 import os, urllib
+from urlparse import urlparse
 import hmac, hashlib #for creating S3 signature
 import time
-from urlparse import urlparse
+import multiprocessing
 
 app = Flask(__name__)
 if os.environ.get('MODE') == 'dev':
@@ -55,11 +56,13 @@ def cache(key):
         response.headers['X-Accel-Redirect'] = '/cache/%s' % urllib.quote(key_filename)
         return response
 
-    # TODO: Use multiprocessing and file locking
-    save_file(full_url)
+    # save file in non-blocking process
+    # TODO: Use file locking
+    p = multiprocessing.Process(target = save_file, args = (full_url, ))
+    p.start()
 
-    #return redirect(full_url)
-    return '%s\n%s' % (full_path, generated_signature)
+    return redirect(full_url)
+    #return '%s\n%s' % (full_path, generated_signature)
 
 
 # Adapted from https://github.com/nzoschke/s3/blob/master/s3.py

@@ -20,10 +20,14 @@ VOLUME ["/etc/nginx/sites-enabled", "/etc/nginx/certs", "/etc/nginx/conf.d", "/v
 #COPY nginx/sites-enabled /etc/nginx/sites-enabled
 COPY nginx/sites-enabled/default /etc/nginx/sites-enabled/default
 
+# Install cron for expiring old cached files
+RUN apt-get install -y cron
+
 # Install vim (good for debugging)
 RUN apt-get install -y vim
 
 EXPOSE 8000 
 RUN mkdir /tmp/s3cache
 VOLUME ["/usr/src/app", "/tmp/s3cache"] #for webapp
+#TODO: Use a proper init system for running multiple programs in container
 CMD nginx && gunicorn --config gunicorn.py.ini app:app

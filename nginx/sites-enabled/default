@@ -29,6 +29,6 @@ server {
 
   location /cache/ {
     internal;
-    alias /tmp/s3cache/; #trailing slash
+    alias /usr/src/app/cache/; #trailing slash
   }
 }

@@ -1,6 +1,6 @@
 from flask import Flask, request, redirect, abort, make_response
 
-import os, urllib
+import os, shutil, urllib
 from urlparse import urlparse
 import hmac, hashlib #for creating S3 signature
 import time
@@ -13,7 +13,7 @@ if os.environ.get('MODE') == 'dev':
 # Have bucket name be subdomain and not as a folder or else `save_file` will
 # not determine the 'key'/filename properly.
 BASE_S3_URL = 'http://%s.s3.amazonaws.com' % os.environ['S3_BUCKET']
-CACHE_ROOT = '/tmp/s3cache' #no trailing /
+CACHE_ROOT = '/usr/src/app/cache' #no trailing /
 
 @app.route('/')
 def home():
@@ -112,7 +112,11 @@ def save_file(url):
         # unlock file
         fcntl.lockf(f, fcntl.LOCK_UN)
         f.close()
-    os.rename(temp, target)
+    # We use move over os.rename since rename does not handle moving files
+    # across different partitions (important sine we mount target as local
+    # volume in docker while temp is inside the VM).
+    shutil.move(temp, target)
+    os.chmod(target, 0666)
 
 def is_url_cached(url):
     key = urlparse(url).path.lstrip('/')

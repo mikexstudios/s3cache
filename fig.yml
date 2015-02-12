@@ -3,8 +3,8 @@
 web:
   build: .
   volumes:
-    # For some reason, can't seem to mount more than one shared volume.
-    - .:/usr/src/app/:ro
+    # We don't mount as read-only since our cache directory is inside
+    - .:/usr/src/app/
   ports:
     - 80:80
   environment:

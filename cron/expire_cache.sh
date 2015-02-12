@@ -6,7 +6,7 @@
 set -eo pipefail
 
 # Get % of used disk space
-THRESHOLD_PCT=75 #%. Above this % of used diskspace, cache is expired
+THRESHOLD_PCT=95 #%. Above this % of used diskspace, cache is expired
 USED_PCT=$(df | grep /usr/src/app | awk '{print $5}' | sed 's/%$//')
 if (( $USED_PCT < $THRESHOLD_PCT )); then
   echo 'No need to prune. Exiting...'
@@ -14,7 +14,7 @@ if (( $USED_PCT < $THRESHOLD_PCT )); then
 fi
 
 # From: http://unix.stackexchange.com/a/29205
-DELETE_LIMIT=20 # number of oldest files deleted
+DELETE_LIMIT=2000 # number of oldest files deleted
 echo 'Pruning older cached files...'
 while IFS= read -r -d $'\0' line ; do
   file="${line#* }"

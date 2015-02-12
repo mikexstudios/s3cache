@@ -1,5 +1,8 @@
 #!/bin/bash
 # Deletes the n oldest files in the directory this script is run.
+# Set it to run via cron every n minutes, like:
+# */15 * * * * cd /usr/src/app/cache/test && /usr/src/app/cron/expire_cache.sh
+# Make sure to run the cron daemon too!
 set -eo pipefail
 
 # Get % of used disk space

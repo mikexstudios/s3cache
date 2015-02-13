@@ -7,7 +7,7 @@ set -eo pipefail
 
 # Get % of used disk space
 THRESHOLD_PCT=95 #%. Above this % of used diskspace, cache is expired
-USED_PCT=$(df | grep /usr/src/app | awk '{print $5}' | sed 's/%$//')
+USED_PCT=$(df -ah | grep "/usr/src/app" | head -n1 | awk '{print $5}' | sed 's/%$//')
 if (( $USED_PCT < $THRESHOLD_PCT )); then
   echo 'No need to prune. Exiting...'
   exit #no need to prune

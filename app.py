@@ -17,10 +17,13 @@ CACHE_ROOT = '/usr/src/app/cache' #no trailing /
 
 @app.route('/')
 def home():
-    return 'Hello World!'
+    return ''
 
 @app.route('/<path:key>')
 def cache(key):
+    # NOTE: This proxy assumes that all S3 filenames/keys are python strings
+    # with utf-8 bytecode.
+    key = key.encode('utf-8')
     key = urllib.quote(key)
 
     # reconstruct original S3 path:
@@ -28,7 +31,8 @@ def cache(key):
     full_url = '%s/%s' % (BASE_S3_URL, full_path)
 
     # verify expires
-    expires = int(request.args.get('Expires'))
+    # NOTE: For now, if Expires field does not exist, throw 401.
+    expires = int(request.args.get('Expires', -1))
     now = int(time.time())
     if expires <= now:
         abort(401)
@@ -79,7 +83,7 @@ def get_s3_signature(key, expires):
         raise Exception('No S3_BUCKET or S3_SECRET_ACCESS_KEY defined!')
 
     string_to_sign = '%s\n\n\n%s\n%s' % (http_verb, str(expires), canonical_string)
-    string_to_sign = unicode(string_to_sign, 'utf-8')
+    #string_to_sign = string_to_sign.encode('utf-8')
     signature = hmac.new(secret_access_key, string_to_sign, hashlib.sha1)
     signature = urllib.quote_plus(signature.digest().encode('base64').rstrip('\n'))
     return signature

@@ -33,9 +33,48 @@ few differences:
 - chef cookbook is included to quickly bootstrap this app on any ubuntu-like
   server.
 
+
 ## Getting started
 
-TODO
+The easiest way to try out s3cache locally is to use
+[docker-compose/fig](https://github.com/docker/fig): 
+
+```bash
+S3_ACCESS_KEY_ID=[access key] S3_SECRET_ACCESS_KEY=[secret key] \
+  S3_BUCKET=[bucket name] fig up
+```
+
+If you do not wish to use docker-compose/fig, then you can manually run the
+docker container:
+
+```bash
+docker pull mikexstudios/s3cache
+docker run --env="S3_BUCKET=[bucket name]" \
+           --env="S3_ACCESS_KEY_ID=[access key]" \
+           --env="S3_SECRET_ACCESS_KEY=[secret key]" \
+           --publish="80:80" \
+           --volume="/tmp/s3cache:/usr/src/app/cache" \
+           mikexstudios/s3cache
+```
+
+Then get the private IP address of the docker instance:
+
+```bash
+docker inspect --format '{{ .NetworkSettings.IPAddress }}' <container-id-or-name>
+```
+
+or (if you're using boot2docker):
+
+```bash
+boot2docker ip
+```
+
+And visit that page in your web browser. You should see a blank page.
+
+Now, add an S3 path to the URL. For example: 
+`http://[local ip]/folder/file.ext?Signature=Xyj%2BMvilNgqLr67gF%2J97HDiJC%2Fs%3D&Expires=1423846845&AWSAccessKeyId=[some access key]`
+You should receive the file as a download.
+
 
 ## How it works
 

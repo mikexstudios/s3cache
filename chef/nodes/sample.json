@@ -1,6 +1,6 @@
 {
   "run_list": [
-    "recipe[s3cache::default]",
+    "recipe[s3cache::default]"
   ],
   "s3cache": {
     "S3_BUCKET": "",

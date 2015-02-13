@@ -1,4 +1,4 @@
-## Testing chef deployment
+## Automated deployment
 
 We deploy s3cache by spinning up a Ubuntu server, installing docker, and then
 pulling and running the `mikexstudios/s3cache` image from the docker hub.

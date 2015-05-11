@@ -1,7 +1,3 @@
-# Require https://github.com/gevent/gevent/pull/517 to fix SSL3 error.
-#gevent >=1.0.1, <1.0.99 #adding async support to gunicorn
-#cython >=0.21.2, <0.21.99 #required for building gevent from git
-#-e git://github.com/gevent/gevent.git@72119c8c3e704b75a2d91d8555ca8673928ebabb#egg=gevent
 eventlet >=0.16.1, <0.16.99
 gunicorn >=19.2.1, <19.2.99
 

@@ -7,10 +7,12 @@ web:
     - .:/usr/src/app/
   ports:
     - 80:80
+  env_file: ./.env #place env vars in this file
   environment:
     - PYTHONUNBUFFERED=True #disable print buffering in gunicorn
-    - MODE=dev
-    - S3_BUCKET #define on command line
-    - S3_ACCESS_KEY_ID #define on command line
-    - S3_SECRET_ACCESS_KEY #define on command line
+    #- MODE=dev
+    #- S3_BUCKET #define in .env file
+    #- S3_ACCESS_KEY_ID #define in .env file
+    #- S3_SECRET_ACCESS_KEY #define in .env file
+  restart: always
 

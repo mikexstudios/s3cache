@@ -1,9 +1,69 @@
 # s3cache
 
-s3cache is a proxy for Amazon's S3 that caches files. Significant bandwidth costs
-can be saved by serving S3 files locally. Older less frequenly accessed cached files
-are automatically expired when disk space runs low. Built using nginx +
-gunicorn + flask in a docker container for easy deployment.
+s3cache is a drop-in proxy for Amazon's S3 that serves files from a local cache, 
+when possible, to significantly reduce data transfer costs.
+
+Older, less frequently accessed cached files are automatically expired when
+disk space runs low. Built using nginx + gunicorn + flask, the entire proxy
+runs in a single docker container for easy deployment. 
+
+This project was inspired and guided by Akeem McLennon's
+[docker-s3cache](https://github.com/AkeemMcLennon/docker-s3cache) with a [number
+of differences](#differences).
+
+## Getting started
+
+The easiest way to try out s3cache locally is to use
+[docker-compose](https://github.com/docker/compose): 
+
+```bash
+S3_ACCESS_KEY_ID=[access key] S3_SECRET_ACCESS_KEY=[secret key] \
+  S3_BUCKET=[bucket name] docker-compose up
+```
+
+If you do not wish to use docker-compose, then you can manually run the
+docker container:
+
+```bash
+docker pull mikexstudios/s3cache
+docker run --env="S3_BUCKET=[bucket name]" \
+           --env="S3_ACCESS_KEY_ID=[access key]" \
+           --env="S3_SECRET_ACCESS_KEY=[secret key]" \
+           --publish="80:80" \
+           --volume="/tmp/s3cache:/usr/src/app/cache" \
+           mikexstudios/s3cache
+```
+
+Once the container is running, visit that page in your web browser. You should
+see a blank page. To use the proxy, simply change your S3 URL from (for example):
+
+```
+http://s3.amazonaws.com/bucketname/folder/file.ext?Signature=Xyj%2BMvilNgqLr67gF%2J97HDiJC%2Fs%3D&Expires=1423846845&AWSAccessKeyId=[some access key]`
+```
+
+to:
+
+```
+http://[servername]/bucketname/folder/file.ext?Signature=Xyj%2BMvilNgqLr67gF%2J97HDiJC%2Fs%3D&Expires=1423846845&AWSAccessKeyId=[some access key]`
+```
+
+You should receive the file as a download and see that it has been cached under
+`/usr/src/app/cache`.
+
+
+## Deployment
+
+For production deployment, you may want to use the [included chef
+cookbook](https://github.com/mikexstudios/s3cache/tree/master/chef)
+to automatically provision a server with docker and run s3cache.
+
+
+## How it works
+
+TODO
+
+
+## Differences
 
 This project was inspired and guided by Akeem McLennon's
 [docker-s3cache](https://github.com/AkeemMcLennon/docker-s3cache). There are a 
@@ -33,49 +93,3 @@ few differences:
 - chef cookbook is included to quickly bootstrap this app on any ubuntu-like
   server.
 
-
-## Getting started
-
-The easiest way to try out s3cache locally is to use
-[docker-compose/fig](https://github.com/docker/fig): 
-
-```bash
-S3_ACCESS_KEY_ID=[access key] S3_SECRET_ACCESS_KEY=[secret key] \
-  S3_BUCKET=[bucket name] fig up
-```
-
-If you do not wish to use docker-compose/fig, then you can manually run the
-docker container:
-
-```bash
-docker pull mikexstudios/s3cache
-docker run --env="S3_BUCKET=[bucket name]" \
-           --env="S3_ACCESS_KEY_ID=[access key]" \
-           --env="S3_SECRET_ACCESS_KEY=[secret key]" \
-           --publish="80:80" \
-           --volume="/tmp/s3cache:/usr/src/app/cache" \
-           mikexstudios/s3cache
-```
-
-Then get the private IP address of the docker instance:
-
-```bash
-docker inspect --format '{{ .NetworkSettings.IPAddress }}' <container-id-or-name>
-```
-
-or (if you're using boot2docker):
-
-```bash
-boot2docker ip
-```
-
-And visit that page in your web browser. You should see a blank page.
-
-Now, add an S3 path to the URL. For example: 
-`http://[local ip]/folder/file.ext?Signature=Xyj%2BMvilNgqLr67gF%2J97HDiJC%2Fs%3D&Expires=1423846845&AWSAccessKeyId=[some access key]`
-You should receive the file as a download.
-
-
-## How it works
-
-TODO

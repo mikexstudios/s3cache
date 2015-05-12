@@ -53,9 +53,10 @@ You should receive the file as a download and see that it has been cached under
 
 ## Deployment
 
-For production deployment, you may want to use the [included chef
-cookbook](https://github.com/mikexstudios/s3cache/tree/master/chef)
-to automatically provision a server with docker and run s3cache.
+For production deployment, you may want to use the [included ansible
+playbook](https://github.com/mikexstudios/s3cache/tree/master/ansible)
+to automatically provision a server with docker, pull the s3cache image, and
+run the container.
 
 
 ## How it works
@@ -90,6 +91,6 @@ few differences:
   removed if the app crashes.
 - cron job is used to expire old cached files instead of using a background 
   thread on each request.
-- chef cookbook is included to quickly bootstrap this app on any ubuntu-like
+- ansible playbook is included to quickly bootstrap this app on any ubuntu-like
   server.
 

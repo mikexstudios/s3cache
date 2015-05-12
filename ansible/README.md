@@ -11,13 +11,20 @@ full-fledged Ubuntu virtual machine and run the ansible playbook. We do not
 test through Docker since their Ubuntu images are stripped down and do not
 perfectly mimic a VPS or dedicated server. The steps are:
 
-1. Pull in 3rd party playbooks:
+1. Install [ansible](https://github.com/ansible/ansible). It is recommended to 
+   use the HEAD branch of ansible since it includes many bugfixes:
+
+   ```bash
+   brew install --HEAD ansible
+   ```
+
+2. Pull in 3rd party playbooks:
 
    ```bash
    ansible-galaxy install -r requirements.yml
    ```
 
-2. Start vagrant:
+3. Start vagrant:
 
    ```bash
    S3_ACCESS_KEY_ID=[access key] S3_SECRET_ACCESS_KEY=[secret key] \
@@ -26,3 +33,5 @@ perfectly mimic a VPS or dedicated server. The steps are:
 
 That's it! Whenever you make a change, you can simply reprovision vagrant by:
 `vagrant provision`.
+
+

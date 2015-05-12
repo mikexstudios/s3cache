@@ -1,4 +1,10 @@
 ---
 # See: http://docs.ansible.com/galaxy.html#advanced-control-over-role-requirements-files
-- src: https://github.com/angstwad/docker.ubuntu
-  #version: 0019ffc9245a09192bc182e18c0732a9a83b2356
+ 
+- src: https://github.com/weareinteractive/ansible-docker
+  name: franklinkim.docker
+  version: 1.4.2
+
+- src: https://github.com/weareinteractive/ansible-docker-compose
+  name: franklinkim.docker-compose
+  version: 1.0.0

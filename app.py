@@ -61,7 +61,6 @@ def cache(key):
         return response
 
     # save file in non-blocking process
-    # TODO: Use file locking
     p = multiprocessing.Process(target = save_file, args = (full_url, ))
     p.start()
 

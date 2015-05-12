@@ -1,0 +1,4 @@
+---
+# See: http://docs.ansible.com/galaxy.html#advanced-control-over-role-requirements-files
+- src: https://github.com/angstwad/docker.ubuntu
+  #version: 0019ffc9245a09192bc182e18c0732a9a83b2356

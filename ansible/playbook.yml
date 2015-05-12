@@ -1,0 +1,7 @@
+---
+- name: install docker
+  hosts: default
+  sudo: yes
+  roles:
+    - docker.ubuntu
+

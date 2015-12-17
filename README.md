@@ -63,6 +63,12 @@ run the container.
 
 TODO
 
+## Development
+
+1. After checking out the repository and making your edits, build the `Dockerfile`:
+   `docker build -t mikexstudios/s3cache .`
+2. `docker push mikexstudios/s3cache`
+
 
 ## Differences
 

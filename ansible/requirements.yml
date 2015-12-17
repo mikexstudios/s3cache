@@ -3,7 +3,7 @@
  
 - src: https://github.com/weareinteractive/ansible-docker
   name: franklinkim.docker
-  version: 1.4.2
+  version: 1.6.0
 
 #- src: https://github.com/weareinteractive/ansible-docker-compose
 #  name: franklinkim.docker-compose

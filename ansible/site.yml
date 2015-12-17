@@ -2,8 +2,6 @@
 - name: install docker
   sudo: yes
   hosts: default
-  vars:
-    docker_package: lxc-docker-1.6.1
   roles:
     - franklinkim.docker
 

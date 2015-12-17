@@ -98,7 +98,14 @@ def save_file(url):
     target = os.path.join(CACHE_ROOT, key)
     # NOTE: To get a lock we need to open the file, but before saving
     # the URL retrieved file, we need to unlock.
-    f = open(target, 'w') 
+    try:
+        f = open(target, 'w') 
+    except IOError:
+        # FAIL: docker aufs has a filename limitation of 242 characters
+        # https://github.com/docker/docker/issues/1413
+        # In those cases, open will fail with IOError. This catches that 
+        # error and does NOT save the file.
+        return
 
     # Lock file to prevent multiple downloads of same file. If lock exists,
     # skip getting file.

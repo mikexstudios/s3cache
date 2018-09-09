@@ -8,14 +8,14 @@ services:
       # We don't mount as read-only since our cache directory is inside
       - ./app:/usr/src/app
     env_file: ./.env # apparently need this or else .env not read
-    ports:
-      - 8000:8000
 
   http:
     build: ./http
     restart: unless-stopped
     volumes:
       - ./http/.caddy:/root/.caddy
+      # Need to mount uploads/ since songs/ may symlink to that directory.
+      - ./app/cache:/usr/src/app/cache
     ports:
       - 443:443
     env_file: ./.env

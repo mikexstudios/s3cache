@@ -55,9 +55,9 @@ def cache(key):
         #TODO: Implement partial downloads?
         response.headers['Content-Type'] = 'application/octet-stream'
         response.headers['Content-Disposition'] = 'attachment; filename=%s' % key
-        # X-Accel-Redirect unquotes whatever is passed to it, so we need to
-        # double quote it.
-        response.headers['X-Accel-Redirect'] = '/cache/%s' % urllib.quote(key_filename)
+        # Caddy does not unquote the path, so don't need to quote the filename
+        # (unlike nginx where the name had to be quoted again).
+        response.headers['X-Accel-Redirect'] = '/cache/%s' % key_filename
         return response
 
     # save file in non-blocking process

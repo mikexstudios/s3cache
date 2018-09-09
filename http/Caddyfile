@@ -1,9 +1,15 @@
 {$SITE_ADDRESSES} {
-  # root /usr/src/app
+  root /usr/src/app
+
+  # The proxy needs to set the "X-Accel-Redirect" header to access cached files.
+  internal /cache
 
   # 'app' is a hostname alias set up by docker
   proxy / app:8000 {
     transparent
+
+    # Don't send internal download requests to the proxy.
+    except /cache
   }
 
   tls {$TLS}

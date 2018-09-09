@@ -1,0 +1,18 @@
+{$SITE_ADDRESSES} {
+  # root /usr/src/app
+
+  # 'app' is a hostname alias set up by docker
+  proxy / app:8000 {
+    transparent
+  }
+
+  tls {$TLS}
+
+  log stdout
+  errors stdout
+
+  header / {
+    # Do not show own server and proxied app's server
+    -Server
+  }
+}

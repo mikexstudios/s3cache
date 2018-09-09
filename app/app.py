@@ -76,10 +76,10 @@ def get_s3_signature(key, expires):
     bucket = os.environ['S3_BUCKET']
     canonical_string = '/%s/%s' % (bucket, key)
     canonical_string = canonical_string.rstrip('/') #when key = ''
-    secret_access_key = os.environ['S3_SECRET_ACCESS_KEY']
+    secret_access_key = os.environ['AWS_SECRET_ACCESS_KEY']
 
     if bucket == '' or secret_access_key == '':
-        raise Exception('No S3_BUCKET or S3_SECRET_ACCESS_KEY defined!')
+        raise Exception('No S3_BUCKET or AWS_SECRET_ACCESS_KEY defined!')
 
     string_to_sign = '%s\n\n\n%s\n%s' % (http_verb, str(expires), canonical_string)
     #string_to_sign = string_to_sign.encode('utf-8')

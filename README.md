@@ -4,73 +4,45 @@ s3cache is a drop-in proxy for Amazon's S3 that serves files from a local cache,
 when possible, to significantly reduce data transfer costs.
 
 Older, less frequently accessed cached files are automatically expired when
-disk space runs low. Built using nginx + gunicorn + flask, the entire proxy
-runs in a single docker container for easy deployment. 
+disk space runs low. Built using Caddy + gunicorn + flask, the entire proxy
+runs with a single docker-compose command for easy deployment. 
 
-This project was inspired and guided by Akeem McLennon's
-[docker-s3cache](https://github.com/AkeemMcLennon/docker-s3cache) with a [number
-of differences](#differences).
+## Usage
 
-## Getting started
+1. Set up environment variables in `.env`. An example environment file is 
+   provided. To use, rename `.env.example` to `.env` and fill out the blanks.
 
-The easiest way to try out s3cache locally is to use
-[docker-compose](https://github.com/docker/compose): 
+2. Run the stack with docker-compose:
+   
+   ```
+   docker-compose up
+   ```
 
-```bash
-S3_ACCESS_KEY_ID=[access key] S3_SECRET_ACCESS_KEY=[secret key] \
-  S3_BUCKET=[bucket name] docker-compose up
-```
+3. Once the container is running, visit that page in your web browser. You
+   should see a blank page. To use the proxy, simply change your S3 URL from
+   (for example):
 
-If you do not wish to use docker-compose, then you can manually run the
-docker container:
+   ```
+   http://s3.amazonaws.com/bucketname/folder/file.ext?Signature=Xyj%2BMvilNgqLr67gF%2J97HDiJC%2Fs%3D&Expires=1423846845&AWSAccessKeyId=[some access key]`
+   ```
 
-```bash
-docker pull mikexstudios/s3cache
-docker run --env="S3_BUCKET=[bucket name]" \
-           --env="S3_ACCESS_KEY_ID=[access key]" \
-           --env="S3_SECRET_ACCESS_KEY=[secret key]" \
-           --publish="80:80" \
-           --volume="/tmp/s3cache:/usr/src/app/cache" \
-           mikexstudios/s3cache
-```
+   to:
 
-Once the container is running, visit that page in your web browser. You should
-see a blank page. To use the proxy, simply change your S3 URL from (for example):
+   ```
+   http://[servername]/bucketname/folder/file.ext?Signature=Xyj%2BMvilNgqLr67gF%2J97HDiJC%2Fs%3D&Expires=1423846845&AWSAccessKeyId=[some access key]`
+   ```
 
-```
-http://s3.amazonaws.com/bucketname/folder/file.ext?Signature=Xyj%2BMvilNgqLr67gF%2J97HDiJC%2Fs%3D&Expires=1423846845&AWSAccessKeyId=[some access key]`
-```
-
-to:
-
-```
-http://[servername]/bucketname/folder/file.ext?Signature=Xyj%2BMvilNgqLr67gF%2J97HDiJC%2Fs%3D&Expires=1423846845&AWSAccessKeyId=[some access key]`
-```
-
-You should receive the file as a download and see that it has been cached under
-`/usr/src/app/cache`.
-
-
-## Deployment
-
-For production deployment, you may want to use the [included ansible
-playbook](https://github.com/mikexstudios/s3cache/tree/master/ansible)
-to automatically provision a server with docker, pull the s3cache image, and
-run the container.
-
+   You should receive the file as a download and see that it has been cached under
+   `/usr/src/app/cache`.
 
 ## How it works
 
-TODO
+When the S3 file is first sent to s3cache, the user is redirected to the actual
+S3 URL while s3cache fetches the file in the background. When the file exists
+on disk, then subsequent requests are served from the cache instead of hitting
+S3. When the disk grows above 90% full, older files are deleted.
 
-## Development
-
-1. After checking out the repository and making your edits, build the `Dockerfile`:
-   `docker build -t mikexstudios/s3cache .`
-2. `docker push mikexstudios/s3cache`
-
-
-## Differences
+## Credits
 
 This project was inspired and guided by Akeem McLennon's
 [docker-s3cache](https://github.com/AkeemMcLennon/docker-s3cache). There are a 
@@ -84,12 +56,11 @@ few differences:
   [python:2.7-onbuild](https://registry.hub.docker.com/_/python/), which
   automatically installs from requirements.txt and copies app into the
   /usr/src/app folder.
-- gunicorn + eventlet serves as the app runner instead of uwsgi. nginx is
+- gunicorn + eventlet serves as the app runner instead of uwsgi. Caddy is
   configured for gunicorn.
-- [docker-compose/fig](https://github.com/docker/fig) is used for fast local
-  development. gunicorn is set to hot reload the app server upon file change.
-  The app folder is mounted as a volume in docker to reflect immediate file
-  changes.
+- docker-compose is used for fast local development. gunicorn is set to hot
+  reload the app server upon file change. The app folder is mounted as a volume
+  in docker to reflect immediate file changes.
 - python's multiprocessing module replaces threading to cache S3 files in the
   background.
 - `fcntl.flock` is employed for file locking during background S3 file caching
@@ -97,6 +68,3 @@ few differences:
   removed if the app crashes.
 - cron job is used to expire old cached files instead of using a background 
   thread on each request.
-- ansible playbook is included to quickly bootstrap this app on any ubuntu-like
-  server.
-

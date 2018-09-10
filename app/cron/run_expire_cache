@@ -1,0 +1,3 @@
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+*/1 * * * * root cd /usr/src/app/cache/ && /usr/src/app/cron/expire_cache.sh
